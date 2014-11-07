@@ -57,7 +57,11 @@ var jqFileUpload = Ember.Component.extend({
         data.context[i].set('status', 'error');
       }
     });
-  }.on('didInsertElement')
+  }.on('didInsertElement'),
+
+  _destroyFileUpload: function() {
+    this.$().fileupload('destroy');
+  }.on("willDestroyElement")
 
 });
 
