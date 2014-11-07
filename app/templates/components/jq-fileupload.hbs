@@ -1,0 +1,23 @@
+<div>
+  <span class="btn btn-default fileinput-button">
+  <i class="glyphicon glyphglyphicon glyphicon-plus"></i>
+    <span>Upload File</span>
+    <!-- The file input field used as target for the file upload widget -->
+    <input id="fileupload" type="file" name="files[]" multiple>
+  </span>
+</div>
+<hr />
+<div>
+  <tbody class="table-striped">
+    {{#each record in files}}
+      <tr>
+        <td>
+          {{record.name}}
+        </td>
+        <td>
+          {{record.progress}}
+        </td>
+      </tr>
+    {{/each}}
+  </tbody>
+</div>

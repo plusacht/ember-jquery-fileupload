@@ -1,6 +1,10 @@
-# Ember-cli-jquery-fileupload
+# Ember-jquery-fileupload
 
-This README outlines the details of collaborating on this Ember addon.
+jQueryFileUpload add-on for ember-cli
+
+## Important
+
+This is very WIP atm...
 
 ## Installation
 

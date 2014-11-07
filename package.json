@@ -1,6 +1,6 @@
 {
-  "name": "ember-cli-jquery-fileupload",
-  "version": "0.0.0",
+  "name": "ember-jquery-fileupload",
+  "version": "0.0.1",
   "directories": {
     "doc": "doc",
     "test": "tests"
@@ -10,7 +10,7 @@
     "build": "ember build",
     "test": "ember test"
   },
-  "repository": "https://github.com/stefanpenner/ember-cli",
+  "repository": "https://github.com/plusacht/ember-jquery-fileupload",
   "engines": {
     "node": ">= 0.10.0"
   },
