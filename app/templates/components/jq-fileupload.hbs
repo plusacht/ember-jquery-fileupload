@@ -7,17 +7,26 @@
   </span>
 </div>
 <hr />
+<button {{action startAllUploads}}>start uploads</button>
 <div>
-  <tbody class="table-striped">
-    {{#each record in files}}
-      <tr>
-        <td>
-          {{record.name}}
-        </td>
-        <td>
-          {{record.progress}}
-        </td>
-      </tr>
+  {{#each upload in uploads}}
+  <button {{action startUpload upload}}>start upload</button>
+    {{#each file in upload}}
+    <table>
+      <tbody class="table-striped">
+        <tr>
+          <td>
+            {{file.name}}
+          </td>
+          <td>
+            {{file.size}}
+          </td>
+          <td>
+            {{file.progress}}
+          </td>
+        </tr>
+      </tbody>
+    </table>
     {{/each}}
-  </tbody>
+  {{/each}}
 </div>

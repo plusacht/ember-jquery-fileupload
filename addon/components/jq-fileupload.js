@@ -1,5 +1,6 @@
 import Ember from 'ember';
-import FileUploadModel from 'ember-jquery-fileupload/core/uploadFileModel';
+import FileUploadModel from 'ember-jquery-fileupload/core/upload_file_model';
+import UploadModel from 'ember-jquery-fileupload/core/upload_model';
 
 var jqFileUpload = Ember.Component.extend({
   action: 'http://localhost:8888',
@@ -10,54 +11,103 @@ var jqFileUpload = Ember.Component.extend({
 
   overallProgress: 0,
 
-  files: Ember.A(),
+
+  autoUpload: false,
+  //dataType: 'json',
+  uploads: Ember.A(),
 
   _initFileUpload: function() {
     var self = this;
 
     this.$().fileupload({
       dataType: 'json',
-      autoUpload: true
-    })
-    .on('fileuploadadd', function (e, data) {
+      autoUpload: true,
+      singleFileUploads: false,
 
-      data.context = Ember.A();
-      for (var i=0;i<data.files.length;i++) {
-        data.context.push(
-          FileUploadModel.create({
-            name: data.files[i].name
-          })
-        );
-        self.get('files').addObject(data.context[i]);
-      }
+      add: function(e, data) {
+        data.context = UploadModel.create({
+          content: [],
+          submit: data
+        });
 
-    })
-    .on('fileuploadsend', function(e, data) {
-      for (var i=0;i<data.context.length;i++) {
-        data.context[i].set('status', 'uploading');
-      }
-    })
-    .on('fileuploadprogressall', function (e, data) {
-      self.set('overallProgress',  parseInt(data.loaded / data.total * 100, 10));
-    })
-    .on('fileuploadprogress', function (e, data) {
+        data.files.forEach(function(item){
+          data.context.addObject(
+            FileUploadModel.create({
+              name: item.name,
+              status: "uploading"
+            })
+          );
 
-      for (var i=0;i<data.context.length;i++) {
-        data.context[i].set('progress', parseInt(data.loaded / data.total * 100, 10));
-      }
 
-    })
-    .on('fileuploaddone', function (e, data) {
-      for (var i=0;i<data.context.length;i++) {
-        data.context[i].set('status', 'success');
-      }
-    })
-    .on('fileuploadfail', function (e, data) {
-      for (var i=0;i<data.context.length;i++) {
-        data.context[i].set('status', 'error');
+        });
+
+        self.get('uploads').addObject(data.context);
+
+        data.process(function () {
+          return self.$().fileupload('process', data);
+        }).always(function () {
+          data.context.forEach(function(item,index){
+            item.set('size', data.files[index].size);
+          });
+        }).done(function () {
+          if(self.get('autoUpload')) {
+            data.submit();
+          }
+        });
+      },
+
+      send: function(e, data) {
+        data.context.send(data);
+      },
+
+      done: function (e, data) {
+        data.context.done(data);
+      },
+
+      fail: function (e, data) {
+        data.context.fail(data);
+      },
+
+      progress: function (e, data) {
+        debugger;
+        data.context.progress(data);
+      },
+
+      progressall: function (e, data) {
+        self.set('overallProgress',  parseInt(data.loaded / data.total * 100, 10));
+      },
+
+      processstart: function (e) {
+        console.log("pstart");
+        self.set('processing', true);
+      },
+      processstop: function (e) {
+        console.log("pstop");
+        self.set('processing', false);
+      },
+      start: function (e) {
+        console.log("start");
+        self.set('processing', true);
+      },
+      stop: function (e) {
+        console.log("stop");
+        self.set('processing', false);
       }
     });
   }.on('didInsertElement'),
+
+
+
+  actions: {
+    startAllUploads: function() {
+      this.get('uploads').forEach(function(item){
+        item.startUpload();
+      })
+    },
+    startUpload: function(uploadModel) {
+      uploadModel.startUpload();
+    }
+  },
 
   _destroyFileUpload: function() {
     this.$().fileupload('destroy');
