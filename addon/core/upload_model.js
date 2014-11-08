@@ -1,11 +1,25 @@
 import Ember from 'ember';
 
 
-export default Ember.ArrayProxy.extend(Ember.MutableArray,{
+export default Ember.ArrayProxy.extend(Ember.Array,{
+  error: null,
   submit: null,
 
   startUpload: function() {
     this.get('submit').submit();
+  },
+
+  updateSizes: function(files) {
+    this.forEach(function(item,index){
+      item.set('size', files[index].size);
+    });
+  },
+
+  updateErrors: function(error,files) {
+    this.set('error');
+    this.forEach(function(item,index){
+      item.set('error', files[index].error);
+    });
   },
 
   send: function(data) {
@@ -20,9 +34,17 @@ export default Ember.ArrayProxy.extend(Ember.MutableArray,{
     });
   },
 
-  fail: function (data) {
+  abort: function(error, data) {
+    this.forEach(function(item,index){
+      item.set('status', 'aborted');
+      item.set('error', files[index].error || error);
+    });
+  },
+
+  fail: function (error, data) {
     this.forEach(function(item,index){
       item.set('status', 'failed');
+      item.set('error', files[index].error || error);
     });
   },
 

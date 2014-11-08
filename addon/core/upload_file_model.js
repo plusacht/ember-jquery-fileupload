@@ -9,5 +9,6 @@ export default Ember.Object.extend({
   deleteUrl: null,
   url: null,
   progress:0,
-  status: "new" //new,uploading,success,failed
+  status: "new", //new,uploading,success,failed,
+  error: null
 });

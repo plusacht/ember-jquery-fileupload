@@ -25,13 +25,14 @@ var jqFileUpload = Ember.Component.extend({
       singleFileUploads: false,
 
       add: function(e, data) {
+        var models = Ember.A();
         data.context = UploadModel.create({
-          content: [],
+          content: models,
           submit: data
         });
 
         data.files.forEach(function(item){
-          data.context.addObject(
+          models.addObject(
             FileUploadModel.create({
               name: item.name,
               status: "uploading"
@@ -46,12 +47,14 @@ var jqFileUpload = Ember.Component.extend({
         data.process(function () {
           return self.$().fileupload('process', data);
         }).always(function () {
-          data.context.forEach(function(item,index){
-            item.set('size', data.files[index].size);
-          });
+          data.context.updateSizes(data.files);
         }).done(function () {
           if(self.get('autoUpload')) {
             data.submit();
+          }
+        }).fail(function () {
+          if (data.files.error) {
+            data.context.fail(data.files.error, files);
           }
         });
       },
@@ -65,25 +68,20 @@ var jqFileUpload = Ember.Component.extend({
       },
 
       fail: function (e, data) {
-        data.context.fail(data);
+        if (data.errorThrown !== 'abort') {
+          data.context.fail(data.errorThrown, data);
+        } else {
+          data.context.abort(data.errorThrown, data);
+        }
+
       },
 
       progress: function (e, data) {
-        debugger;
         data.context.progress(data);
       },
 
       progressall: function (e, data) {
         self.set('overallProgress',  parseInt(data.loaded / data.total * 100, 10));
-      },
-
-      processstart: function (e) {
-        console.log("pstart");
-        self.set('processing', true);
-      },
-      processstop: function (e) {
-        console.log("pstop");
-        self.set('processing', false);
       },
       start: function (e) {
         console.log("start");

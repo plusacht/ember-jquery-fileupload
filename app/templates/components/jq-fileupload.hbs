@@ -8,6 +8,7 @@
 </div>
 <hr />
 <button {{action startAllUploads}}>start uploads</button>
+progress all: {{progressall}}
 <div>
   {{#each upload in uploads}}
   <button {{action startUpload upload}}>start upload</button>
