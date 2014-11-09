@@ -8,6 +8,7 @@ var jqFileUpload = Ember.Component.extend({
   attributeBindings: ['action','method','enctype'],
   method: 'POST',
   enctype: 'multipart/form-data',
+  disabled: false,
 
   overallProgress: 0,
 
@@ -50,7 +51,7 @@ var jqFileUpload = Ember.Component.extend({
           data.context.updateSizes(data.files);
         }).done(function () {
           if(self.get('autoUpload')) {
-            data.submit();
+            data.context.submit();
           }
         }).fail(function () {
           if (data.files.error) {
@@ -77,6 +78,7 @@ var jqFileUpload = Ember.Component.extend({
       },
 
       progress: function (e, data) {
+        debugger;
         data.context.progress(data);
       },
 
@@ -94,7 +96,13 @@ var jqFileUpload = Ember.Component.extend({
     });
   }.on('didInsertElement'),
 
-
+  disabledObserver: function() {
+    if(this.get('disabled')) {
+     this.$().fileupload('disable');
+   } else {
+      this.$().fileupload('enable');
+   }
+  }.on('disabled'),
 
   actions: {
     startAllUploads: function() {
