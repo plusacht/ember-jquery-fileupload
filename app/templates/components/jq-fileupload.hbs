@@ -7,15 +7,19 @@
   </span>
 </div>
 <hr />
-<button {{action startAllUploads}}>start uploads</button>
+<button {{action 'startAllUploads'}}>start all</button>
+<button {{action 'cancelAllUploads'}}>cancel all</button>
+<br />
 progress all: {{progressall}}
 <div>
   {{#each upload in uploads}}
-  <button {{action startUpload upload}}>start upload</button>
     {{#each file in upload}}
     <table>
-      <tbody class="table-striped">
+      <tbody>
         <tr>
+         <td>
+            {{jq-preview preview=file.preview}}
+          </td>
           <td>
             {{file.name}}
           </td>
@@ -24,6 +28,13 @@ progress all: {{progressall}}
           </td>
           <td>
             {{file.progress}}
+          </td>
+          <td>
+            {{file.error}}
+          </td>
+          <td>
+            <button {{action 'startUpload' upload}}>start start</button>
+            <button {{action 'cancelUpload' upload}}>cancel upload</button>
           </td>
         </tr>
       </tbody>

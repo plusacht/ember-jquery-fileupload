@@ -9,14 +9,19 @@ export default Ember.ArrayProxy.extend(Ember.Array,{
     this.get('submit').submit();
   },
 
-  updateSizes: function(files) {
+  cancelUpload: function() {
+    this.get('submit').abort();
+  },
+
+  updateFromFiles: function(jq,files) {
     this.forEach(function(item,index){
       item.set('size', files[index].size);
+      item.set('preview', files[index].preview);
     });
   },
 
   updateErrors: function(error,files) {
-    this.set('error');
+    this.set('error', error);
     this.forEach(function(item,index){
       item.set('error', files[index].error);
     });
@@ -37,7 +42,9 @@ export default Ember.ArrayProxy.extend(Ember.Array,{
   abort: function(error, data) {
     this.forEach(function(item,index){
       item.set('status', 'aborted');
-      item.set('error', files[index].error || error);
+      if(data.files.error) {
+        item.set('error', data.files[index].error || error);
+      }
     });
   },
 

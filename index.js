@@ -9,13 +9,17 @@ module.exports = {
     this._super.included(app);
 
     var blueimpFileUploadPath = path.join(app.bowerDirectory,'/blueimp-file-upload/');
+    var blueimpLoadImagePath = path.join(app.bowerDirectory,'/blueimp-load-image/')
     var options = app.options['ember-jquery-fileupload'] || {};
 
+    app.import(path.join(blueimpLoadImagePath, 'js/load-image.all.min.js'));
+    app.import(path.join(blueimpFileUploadPath, 'js/cors/jquery.postmessage-transport.js'));
     app.import(path.join(blueimpFileUploadPath, 'js/cors/jquery.postmessage-transport.js'));
     app.import(path.join(blueimpFileUploadPath, 'js/cors/jquery.xdr-transport.js'));
     app.import(path.join(blueimpFileUploadPath, 'js/vendor/jquery.ui.widget.js'));
     app.import(path.join(blueimpFileUploadPath, 'js/jquery.fileupload.js'));
     app.import(path.join(blueimpFileUploadPath, 'js/jquery.fileupload-process.js'));
+    app.import(path.join(blueimpFileUploadPath, 'js/jquery.fileupload-image.js'));
 
     /*
     "css/jquery.fileupload.css",

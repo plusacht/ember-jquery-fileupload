@@ -22,6 +22,7 @@ var jqFileUpload = Ember.Component.extend({
     var self = this;
 
     this.$().fileupload({
+
       dataType: this.get('dataType'),
       autoUpload: this.get('autoUpload'),
       singleFileUploads: this.get('singleFileUploads'),
@@ -37,7 +38,8 @@ var jqFileUpload = Ember.Component.extend({
           models.addObject(
             FileUploadModel.create({
               name: item.name,
-              status: "uploading"
+              type: item.type,
+              lastModified: item.lastModified
             })
           );
 
@@ -49,7 +51,8 @@ var jqFileUpload = Ember.Component.extend({
         data.process(function () {
           return self.$().fileupload('process', data);
         }).always(function () {
-          data.context.updateSizes(data.files);
+          //self.$().append(self.$(data.files[0].preview)).html();
+          data.context.updateFromFiles(self.$, data.files);
         }).done(function () {
           if(self.get('autoUpload')) {
             data.context.submit();
@@ -70,16 +73,15 @@ var jqFileUpload = Ember.Component.extend({
       },
 
       fail: function (e, data) {
+        debugger;
         if (data.errorThrown !== 'abort') {
           data.context.fail(data.errorThrown, data);
         } else {
           data.context.abort(data.errorThrown, data);
         }
-
       },
 
       progress: function (e, data) {
-        debugger;
         data.context.progress(data);
       },
 
@@ -87,11 +89,9 @@ var jqFileUpload = Ember.Component.extend({
         self.set('overallProgress',  parseInt(data.loaded / data.total * 100, 10));
       },
       start: function (e) {
-        console.log("start");
         self.set('processing', true);
       },
       stop: function (e) {
-        console.log("stop");
         self.set('processing', false);
       }
     });
@@ -105,16 +105,24 @@ var jqFileUpload = Ember.Component.extend({
    } else {
       this.$().fileupload('enable');
    }
-  }.on('disabled'),
+  }.observes('disabled'),
 
   actions: {
     startAllUploads: function() {
       this.get('uploads').forEach(function(item){
         item.startUpload();
-      })
+      });
+    },
+    cancelAllUploads: function() {
+      this.get('uploads').forEach(function(item){
+        item.cancelUpload();
+      });
     },
     startUpload: function(uploadModel) {
       uploadModel.startUpload();
+    },
+    cancelUpload: function(uploadModel) {
+      uploadModel.cancelUpload();
     }
   },
 
