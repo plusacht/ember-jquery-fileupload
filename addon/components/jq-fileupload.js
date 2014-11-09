@@ -14,16 +14,17 @@ var jqFileUpload = Ember.Component.extend({
 
 
   autoUpload: false,
-  //dataType: 'json',
+  dataType: 'json',
+  singleFileUploads: false,
   uploads: Ember.A(),
 
   _initFileUpload: function() {
     var self = this;
 
     this.$().fileupload({
-      dataType: 'json',
-      autoUpload: true,
-      singleFileUploads: false,
+      dataType: this.get('dataType'),
+      autoUpload: this.get('autoUpload'),
+      singleFileUploads: this.get('singleFileUploads'),
 
       add: function(e, data) {
         var models = Ember.A();
@@ -94,6 +95,8 @@ var jqFileUpload = Ember.Component.extend({
         self.set('processing', false);
       }
     });
+
+    this.disabledObserver();
   }.on('didInsertElement'),
 
   disabledObserver: function() {
