@@ -9,25 +9,25 @@ var jqFileUpload = Ember.Component.extend({
   method: 'POST',
   enctype: 'multipart/form-data',
   disabled: false,
+  fileuploadOptions: ['replaceFileInput','paramName','singleFileUploads','limitMultiFileUploads','limitMultiFileUploadSize',
+                      'limitMultiFileUploadSizeOverhead','sequentialUploads','limitConcurrentUploads','forceIframeTransport',
+                      'redirect','redirectParamName','postMessage','multipart','maxChunkSize','uploadedBytes',
+                      'recalculateProgress','progressInterval','bitrateInterval','autoUpload'],
 
   overallProgress: 0,
-
-
-  autoUpload: false,
-  dataType: 'json',
-  singleFileUploads: false,
   uploads: Ember.A(),
 
   _initFileUpload: function() {
     var self = this;
+    var options = {};
+    Ember.run.scheduleOnce('afterRender', function() {
+      self.get('fileuploadOptions').forEach(function(item){
+        if(self[item] !== undefined) {
+          options[item] = self[item];
+        }
+      });
 
-    this.$().fileupload({
-
-      dataType: this.get('dataType'),
-      autoUpload: this.get('autoUpload'),
-      singleFileUploads: this.get('singleFileUploads'),
-
-      add: function(e, data) {
+      options.add = function(e, data) {
         var models = Ember.A();
         data.context = UploadModel.create({
           content: models,
@@ -51,7 +51,6 @@ var jqFileUpload = Ember.Component.extend({
         data.process(function () {
           return self.$().fileupload('process', data);
         }).always(function () {
-          //self.$().append(self.$(data.files[0].preview)).html();
           data.context.updateFromFiles(self.$, data.files);
         }).done(function () {
           if(self.get('autoUpload')) {
@@ -59,44 +58,48 @@ var jqFileUpload = Ember.Component.extend({
           }
         }).fail(function () {
           if (data.files.error) {
-            data.context.fail(data.files.error, files);
+            data.context.fail(data.files.error, data.files);
           }
         });
-      },
+      };
 
-      send: function(e, data) {
+      options.send = function(e, data) {
         data.context.send(data);
-      },
+      };
 
-      done: function (e, data) {
+      options.done = function (e, data) {
         data.context.done(data);
-      },
+      };
 
-      fail: function (e, data) {
-        debugger;
+      options.fail = function (e, data) {
         if (data.errorThrown !== 'abort') {
           data.context.fail(data.errorThrown, data);
         } else {
           data.context.abort(data.errorThrown, data);
         }
-      },
+      };
 
-      progress: function (e, data) {
+      options.progress = function (e, data) {
         data.context.progress(data);
-      },
+      };
 
-      progressall: function (e, data) {
+      options.progressall = function (e, data) {
         self.set('overallProgress',  parseInt(data.loaded / data.total * 100, 10));
-      },
-      start: function (e) {
-        self.set('processing', true);
-      },
-      stop: function (e) {
-        self.set('processing', false);
-      }
-    });
+      };
 
-    this.disabledObserver();
+      options.start = function (e) {
+        self.set('processing', true);
+      };
+
+      options.stop = function (e) {
+        self.set('processing', false);
+      };
+
+
+      self.$().fileupload(options);
+
+      self.disabledObserver();
+    });
   }.on('didInsertElement'),
 
   disabledObserver: function() {

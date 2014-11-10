@@ -28,13 +28,13 @@ export default Ember.ArrayProxy.extend(Ember.Array,{
   },
 
   send: function(data) {
-    this.forEach(function(item,index){
+    this.forEach(function(item){
       item.set('status', 'uploading');
     });
   },
 
   done: function (data) {
-   this.forEach(function(item,index){
+   this.forEach(function(item){
       item.set('status', 'success');
     });
   },
@@ -51,13 +51,13 @@ export default Ember.ArrayProxy.extend(Ember.Array,{
   fail: function (error, data) {
     this.forEach(function(item,index){
       item.set('status', 'failed');
-      item.set('error', files[index].error || error);
+      item.set('error', data.files[index].error || error);
     });
   },
 
   progress: function (data) {
-    this.forEach(function(item,index){
-      item.set('progress', parseInt(data.loaded / data.total * 100, 10))
+    this.forEach(function(item){
+      item.set('progress', parseInt(data.loaded / data.total * 100, 10));
     });
   }
 });
